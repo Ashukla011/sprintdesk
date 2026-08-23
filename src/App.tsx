@@ -1,14 +1,29 @@
-function App() {
+import { AppShell } from './components/Layout/AppShell'
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { AnalyticPage } from './pages/AnalyticPage'
+import { BoardPage } from './pages/BoardPage'
+import { DashboardPage } from './pages/DashboardPage'
 
-
+function WorkspaceLayout() {
   return (
-    <>
-      <div className="flex min-h-screen items-center justify-center bg-gray-100">
-      <h1 className="text-4xl font-bold text-blue-600">
-        hello
-      </h1>
-    </div>
-    </>
+    <AppShell>
+      <Outlet />
+    </AppShell>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<WorkspaceLayout />}>
+          <Route element={<DashboardPage />} path="/dashboard" />
+          <Route element={<BoardPage />} path="/board" />
+          <Route element={<AnalyticPage />} path="/analytics" />
+        </Route>
+        <Route element={<Navigate replace to="/dashboard" />} path="*" />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
