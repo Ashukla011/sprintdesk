@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useBoardStore } from "../stores/boardStore";
 import {
   columnOrder,
@@ -38,7 +38,7 @@ const priorityStyles: Record<Priority, string> = {
   high: "bg-rose-100 text-rose-800",
 };
 
-function TaskCard({
+const TaskCard = memo(function TaskCard({
   task,
   onOpen,
 }: {
@@ -76,7 +76,7 @@ function TaskCard({
       </div>
     </article>
   );
-}
+});
 
 function Column({
   column,
@@ -294,7 +294,7 @@ export const BoardPage = () => {
     [priorityFilter, tasks],
   );
   const selectedTask = tasks.find((task) => task.id === selectedTaskId);
-  function handleDragEnd(event: DragEndEvent) {
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
     const overId = event.over?.id;
     if (!overId) return;
     const targetTask = tasks.find((task) => task.id === Number(overId));
@@ -313,7 +313,7 @@ export const BoardPage = () => {
         : destination.length,
     );
     setActiveId(null);
-  }
+  }, [moveTask, tasks]);
   if (isLoading) return <p aria-label="Loading board">Loading board...</p>;
   if (error) return <p role="alert">{error}</p>;
   return (
