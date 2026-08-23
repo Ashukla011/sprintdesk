@@ -13,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { useEffect, useMemo, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { useBoardStore } from "../stores/boardStore";
 import {
   getCompletionTrend,
@@ -26,9 +26,13 @@ const statusColors = ["#a8a29e", "#0ea5e9", "#8b5cf6", "#10b981"];
 
 export const AnalyticPage = () => {
   const { tasks, isLoading, error, loadTasks } = useBoardStore();
+  const hasRequestedTasks = useRef(false);
 
   useEffect(() => {
-    if (!tasks.length) void loadTasks();
+    if (!tasks.length && !hasRequestedTasks.current) {
+      hasRequestedTasks.current = true;
+      void loadTasks();
+    }
   }, [loadTasks, tasks.length]);
 
   const velocity = useMemo(() => getSprintVelocity(tasks), [tasks]);
