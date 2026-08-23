@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuthStore } from '../../stores/authStore'
 
 type NavItem = {
 	label: string
@@ -18,6 +19,7 @@ type AppShellProps = {
 }
 
 export function AppShell({ children }: AppShellProps) {
+	const logout = useAuthStore((state) => state.logout)
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 	const [isDark, setIsDark] = useState(() =>
 		document.documentElement.classList.contains('dark'),
@@ -94,7 +96,7 @@ export function AppShell({ children }: AppShellProps) {
 							<p className="truncate text-sm font-bold">Jordan Davis</p>
 							<p className="truncate text-xs text-stone-500 dark:text-stone-400">Product engineer</p>
 						</div>
-						<button aria-label="Open account menu" className="text-stone-500" type="button">...</button>
+						<button aria-label="Log out" className="text-sm font-bold text-stone-500 hover:text-rose-600" onClick={logout} type="button">Log out</button>
 					</div>
 				</div>
 			</aside>
