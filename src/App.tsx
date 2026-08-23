@@ -1,11 +1,15 @@
 import { AppShell } from './components/Layout/AppShell'
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
-import { AnalyticPage } from './pages/AnalyticPage'
-import { BoardPage } from './pages/BoardPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { LoginPage } from './pages/LoginPage'
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { useAuthStore } from './stores/authStore'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastProvider } from './components/ui'
+
+const queryClient = new QueryClient()
+const AnalyticPage = lazy(() => import('./pages/AnalyticPage').then((module) => ({ default: module.AnalyticPage })))
+const BoardPage = lazy(() => import('./pages/BoardPage').then((module) => ({ default: module.BoardPage })))
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then((module) => ({ default: module.DashboardPage })))
+const LoginPage = lazy(() => import('./pages/LoginPage').then((module) => ({ default: module.LoginPage })))
 
 function LoadingScreen() {
   return <main aria-label="Validating session" className="grid min-h-screen place-items-center bg-stone-50 text-stone-950 dark:bg-stone-950 dark:text-stone-50"><p className="font-bold">Validating session...</p></main>
@@ -36,7 +40,7 @@ function AuthGate() {
   }, [initialize])
 
   if (status === 'loading') return <LoadingScreen />
-  return <AppRoutes />
+  return <Suspense fallback={<LoadingScreen />}>{<AppRoutes />}</Suspense>
 }
 
 function ProtectedRoute() {
@@ -59,9 +63,13 @@ function WorkspaceLayout() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthGate />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <BrowserRouter>
+          <AuthGate />
+        </BrowserRouter>
+      </ToastProvider>
+    </QueryClientProvider>
   )
 }
 

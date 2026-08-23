@@ -97,7 +97,7 @@ describe("App authentication", () => {
     ).toBeInTheDocument();
     await currentUser.click(screen.getByRole("link", { name: /^board$/i }));
     expect(
-      screen.getByRole("heading", { name: /sprint board/i }),
+      await screen.findByRole("heading", { name: /sprint board/i }),
     ).toBeInTheDocument();
   });
 
@@ -111,10 +111,10 @@ describe("App authentication", () => {
     await currentUser.click(screen.getByRole("link", { name: /analytics/i }));
 
     expect(
-      screen.getByRole("heading", { name: "Analytics" }),
+      await screen.findByRole("heading", { name: "Analytics" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { name: /completion trend/i }),
+      await screen.findByRole("heading", { name: /completion trend/i }),
     ).toBeInTheDocument();
   });
 
