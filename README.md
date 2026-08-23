@@ -6,14 +6,18 @@ auth — built as a frontend engineering assignment submission.
 **Live demo:** [Live Demo](https://sprintdesk-avnish6.vercel.app/dashboard) `vercel deploy` 
 **Demo login:** username `emilys`, password `emilyspass` (DummyJSON test account)
 
-![SprintDesk screenshot]
+### Sprintdesk screenshot
+<img width="956" height="412" alt="pic - 1" src="https://github.com/user-attachments/assets/73188eb1-8891-4ab5-9855-bea8a30c0c97" />
+<img width="946" height="409" alt="board" src="https://github.com/user-attachments/assets/3f84f218-5e0f-4536-b3ca-f10a4d869871" />
+
+<img width="935" height="411" alt="analytics" src="https://github.com/user-attachments/assets/0cd370ab-05ca-4f11-a44e-849216bd5bf6" />
 
 
 ## What this demonstrates
 
 | Area | Where |
 |---|---|
-| Token auth + silent refresh + retry | `src/api/client.ts` (axios interceptor) |
+| Token auth + silent refresh + retry | `src/service/authApi.ts` (axios interceptor) |
 | Protected/public-only routing | `src/routes/` |
 | Kanban DnD (cross-column + reorder) | `src/components/board/`, `src/pages/BoardPage.tsx` |
 | Server vs. client vs. local state split | `src/hooks/` (TanStack Query) vs `src/stores/` (Zustand) |
@@ -35,7 +39,7 @@ unit tests for the board store.
 **Not yet implemented — documented per §2 of the brief:**
 - Remember-me / password-strength (bonus, skipped for scope discipline)
 - Select/Toast/DataTable components and the notification polling UI (service
-  layer + store + hook exist in `src/api/notificationService.ts` and
+  layer + store + hook exist in `src/hoke/useNotification.ts` and
   `src/stores/notificationStore.ts`; the bell/panel UI is the remaining wire-up)
 - Auth-interceptor and useToast test coverage beyond the board store
 - Lighthouse pass / axe-core audit
@@ -56,14 +60,13 @@ Select/Toast/DataTable, add auth-interceptor tests, then a Lighthouse pass.
 ## Run locally
 
 ```bash
+cd sprintdesk
+cp .env.example .env #update environment variable
 npm install
 npm run dev        # http://localhost:5173
 npm run build       # production build
 npm run test        # vitest
 ```
-
-No environment variables are required — all API base URLs are public and
-hardcoded per the assignment spec (see `src/api/client.ts`).
 
 ## Architecture
 
