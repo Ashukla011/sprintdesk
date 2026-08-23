@@ -1,75 +1,75 @@
-# React + TypeScript + Vite
+# SprintDesk
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A sprint management dashboard — Kanban board, analytics, notifications, and
+auth — built as a frontend engineering assignment submission.
 
-Currently, two official plugins are available:
+**Live demo:** [Live Demo](https://sprintdesk-avnish6.vercel.app/dashboard) `vercel deploy` 
+**Demo login:** username `emilys`, password `emilyspass` (DummyJSON test account)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Sprintdesk screenshot
+<img width="956" height="412" alt="pic - 1" src="https://github.com/user-attachments/assets/73188eb1-8891-4ab5-9855-bea8a30c0c97" />
+<img width="946" height="409" alt="board" src="https://github.com/user-attachments/assets/3f84f218-5e0f-4536-b3ca-f10a4d869871" />
 
-## React Compiler
+<img width="935" height="411" alt="analytics" src="https://github.com/user-attachments/assets/0cd370ab-05ca-4f11-a44e-849216bd5bf6" />
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+## What this demonstrates
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| Area | Where |
+|---|---|
+| Token auth + silent refresh + retry | `src/service/authApi.ts` (axios interceptor) |
+| Protected/public-only routing | `src/routes/` |
+| Kanban DnD (cross-column + reorder) | `src/components/board/`, `src/pages/BoardPage.tsx` |
+| Server vs. client vs. local state split | `src/hooks/` (TanStack Query) vs `src/stores/` (Zustand) |
+| Layered data-access architecture | `src/api/*Service.ts` — UI never imports axios directly |
+| Charts derived from live board state | `src/pages/AnalyticsPage.tsx` |
+| Route-level code splitting | `React.lazy` + `Suspense` in `src/App.tsx` |
+| Component library from scratch | `src/components/ui/` |
+| Tests | `src/stores/boardStore.test.ts` — `npm run test` |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Status vs. assignment brief
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Done:** auth (login, protected routes, silent refresh + retry, full-screen
+session loading, logout), Kanban board (DnD, add/delete/edit, persisted
+locally, side-drawer detail view), analytics (all 4 required charts, driven
+by live board state, responsive), theme toggle, core design-system
+components (Button, Input, Modal, Skeleton), route-level code splitting,
+unit tests for the board store.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**Not yet implemented — documented per §2 of the brief:**
+- Remember-me / password-strength (bonus, skipped for scope discipline)
+- Select/Toast/DataTable components and the notification polling UI (service
+  layer + store + hook exist in `src/hoke/useNotification.ts` and
+  `src/stores/notificationStore.ts`; the bell/panel UI is the remaining wire-up)
+- Auth-interceptor and useToast test coverage beyond the board store
+- Lighthouse pass / axe-core audit
 
+With more time, next: wire the notification bell + toast-on-new-item, add
+Select/Toast/DataTable, add auth-interceptor tests, then a Lighthouse pass.
+
+## Data sources
+
+- **DummyJSON** (`/auth/login`, `/auth/refresh`) — authentication
+- **mock-data.json** (`public/mock-data.json`) — primary task/board data.
+  This repo ships a schema-matching **generated placeholder** (30 tasks) so
+  the app runs standalone; swap in the assignment-provided file at the same
+  path and shape — no code changes required, since all access goes through
+  `src/api/taskService.ts`.
+- **JSONPlaceholder** (`/posts?_limit=5`) — simulated notification polling feed
+
+## Run locally
+
+```bash
+cd sprintdesk
+cp .env.example .env #update environment variable
+npm install
+npm run dev        # http://localhost:5173
+npm run build       # production build
+npm run test        # vitest
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for the data-flow diagram and the
+reasoning behind the API/service-layer separation, state-management split,
+and board-persistence strategy.

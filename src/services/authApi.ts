@@ -2,6 +2,8 @@ const apiBaseUrl = 'https://dummyjson.com'
 const refreshTokenStorageKey = 'sprintdesk-refresh-token'
 
 let accessToken: string | null = null
+let refreshInFlight: Promise<AuthResponse> | null = null
+let sessionExpiredHandler: (() => void) | null = null
 
 export type AuthUser = {
   id: number
@@ -34,6 +36,11 @@ export function setAccessToken(token: string | null) {
   accessToken = token
 }
 
+/** Lets the app shell react when a background refresh can no longer restore a session. */
+export function setSessionExpiredHandler(handler: (() => void) | null) {
+  sessionExpiredHandler = handler
+}
+
 export function clearRefreshToken() {
   window.localStorage.removeItem(refreshTokenStorageKey)
 }
@@ -63,7 +70,7 @@ export async function loginRequest(username: string, password: string) {
   return response
 }
 
-export async function refreshRequest() {
+async function performRefresh() {
   const refreshToken = window.localStorage.getItem(refreshTokenStorageKey)
   if (!refreshToken) {
     throw new ApiError(401, 'No refresh token available')
@@ -73,6 +80,27 @@ export async function refreshRequest() {
   setAccessToken(response.accessToken)
   window.localStorage.setItem(refreshTokenStorageKey, response.refreshToken)
   return response
+}
+
+/**
+ * One refresh is shared by every request that notices an expired access token.
+ * This is the fetch equivalent of an Axios response-interceptor refresh queue.
+ */
+export async function refreshRequest() {
+  if (!refreshInFlight) {
+    refreshInFlight = performRefresh().finally(() => {
+      refreshInFlight = null
+    })
+  }
+
+  try {
+    return await refreshInFlight
+  } catch (error) {
+    clearRefreshToken()
+    setAccessToken(null)
+    sessionExpiredHandler?.()
+    throw error
+  }
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}, hasRetried = false): Promise<T> {
@@ -87,8 +115,7 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, hasRet
       await refreshRequest()
       return apiRequest<T>(path, init, true)
     } catch {
-      clearRefreshToken()
-      setAccessToken(null)
+      // refreshRequest clears the invalid session and notifies the auth store.
     }
   }
 
@@ -97,4 +124,8 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, hasRet
     throw new ApiError(response.status, getErrorMessage(data, 'Request failed'))
   }
   return data as T
+}
+
+export function getCurrentUser() {
+  return apiRequest<AuthUser>('/auth/me')
 }
