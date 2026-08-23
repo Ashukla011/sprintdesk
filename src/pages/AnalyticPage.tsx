@@ -45,7 +45,7 @@ export const AnalyticPage = () => {
   if (error) return <p role="alert">{error}</p>;
 
   return (
-    <div className="space-y-8">
+    <div className="theme-surface space-y-8 rounded-lg border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900 sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-bold uppercase tracking-widest text-amber-600">
@@ -56,11 +56,13 @@ export const AnalyticPage = () => {
             Live signals from {tasks.length} board tasks
           </p>
         </div>
-        <div className="rounded-md border border-stone-200 bg-white px-4 py-3 text-sm dark:border-stone-800 dark:bg-stone-900">
-          <span className="font-bold">
-            {tasks.filter((task) => task.status === "done").length}
-          </span>{" "}
-          completed tasks
+        <div>
+          <div className="rounded-md border border-stone-200 bg-white px-4 py-3 text-sm dark:border-stone-800 dark:bg-stone-900">
+            <span className="font-bold">
+              {tasks.filter((task) => task.status === "done").length}
+            </span>{" "}
+            completed tasks
+          </div>
         </div>
       </header>
 
