@@ -18,6 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useBoardStore } from "../stores/boardStore";
+import { Button } from "../components/ui";
 import {
   columnOrder,
   type BoardTask,
@@ -59,7 +60,7 @@ const TaskCard = memo(function TaskCard({
       style={{ transform: CSS.Transform.toString(transform), transition }}
       {...attributes}
       {...listeners}
-      className={`cursor-grab rounded-md border border-stone-200 bg-white p-4 shadow-sm active:cursor-grabbing dark:border-stone-700 dark:bg-stone-900 ${isDragging ? "opacity-40" : ""}`}
+      className={`cursor-grab rounded-lg border border-stone-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md active:cursor-grabbing dark:border-stone-700 dark:bg-stone-800 dark:shadow-[0_2px_10px_rgba(0,0,0,0.2)] dark:hover:border-stone-600 ${isDragging ? "opacity-40" : ""}`}
       onClick={() => onOpen(task)}
     >
       <div className="flex items-start justify-between gap-3">
@@ -91,7 +92,7 @@ function Column({
   return (
     <section
       aria-labelledby={`${column.id}-heading`}
-      className={`min-w-[275px] flex-1 rounded-lg bg-stone-100/80 p-3 dark:bg-stone-900/70 ${isOver ? "ring-2 ring-amber-400" : ""}`}
+      className={`min-w-[275px] flex-1 rounded-xl border border-stone-200 bg-stone-100/80 p-3 shadow-sm dark:border-stone-800 dark:bg-stone-950/80 dark:shadow-inner ${isOver ? "ring-2 ring-amber-400" : ""}`}
       ref={setNodeRef}
     >
       <header className="mb-3 flex items-center justify-between px-1">
@@ -102,7 +103,7 @@ function Column({
           <span className={`size-2 rounded-full ${column.accent}`} />
           {column.label}
         </h2>
-        <span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-stone-500 dark:bg-stone-800">
+        <span className="rounded-full bg-white px-2 py-1 text-xs font-bold text-stone-500 shadow-sm dark:bg-stone-900 dark:text-stone-300">
           {tasks.length}
         </span>
       </header>
@@ -175,12 +176,9 @@ function NewTaskForm({ onClose }: { onClose: () => void }) {
           value={dueDate}
         />
       </label>
-      <button
-        className="w-full rounded bg-stone-950 px-4 py-3 font-bold text-white"
-        type="submit"
-      >
+      <Button className="w-full py-3" type="submit">
         Create task
-      </button>
+      </Button>
     </form>
   );
 }
@@ -248,12 +246,9 @@ function TaskDrawer({
           placeholder="Add a comment"
           value={comment}
         />
-        <button
-          className="rounded bg-amber-400 px-3 font-bold text-stone-950"
-          type="submit"
-        >
+        <Button type="submit">
           Add
-        </button>
+        </Button>
       </form>
       <button
         className="mt-10 w-full rounded border border-rose-300 px-4 py-3 font-bold text-rose-700"
@@ -317,7 +312,7 @@ export const BoardPage = () => {
   if (isLoading) return <p aria-label="Loading board">Loading board...</p>;
   if (error) return <p role="alert">{error}</p>;
   return (
-    <div className="space-y-6">
+    <div className="theme-surface space-y-6 rounded-lg border border-stone-200 bg-white p-5 shadow-sm dark:border-stone-800 dark:bg-stone-900 sm:p-6">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm font-bold uppercase tracking-widest text-amber-600">
@@ -342,13 +337,12 @@ export const BoardPage = () => {
             <option value="medium">Medium priority</option>
             <option value="low">Low priority</option>
           </select>
-          <button
-            className="rounded bg-stone-950 px-4 py-2 font-bold text-white dark:bg-amber-400 dark:text-stone-950"
+          <Button
             onClick={() => setShowNewTask(true)}
             type="button"
           >
             + New task
-          </button>
+          </Button>
         </div>
       </header>
       <DndContext

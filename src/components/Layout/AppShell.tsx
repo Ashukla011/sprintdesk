@@ -1,10 +1,9 @@
 import { useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
-import { Button } from "../ui";
+import { Button, ThemeToggle } from "../ui";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useNotificationStore } from "../../stores/notificationStore";
-import { useTheme } from "../../hooks/useTheme";
 
 type NavItem = {
   label: string;
@@ -46,7 +45,6 @@ export function AppShell({ children }: AppShellProps) {
     page * pageSize,
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isDark, toggleTheme } = useTheme();
   const username = user?.username?.trim() || "User";
   const displayName = [user?.firstName, user?.lastName]
     .filter((name): name is string => Boolean(name?.trim()))
@@ -54,7 +52,7 @@ export function AppShell({ children }: AppShellProps) {
   const initials = username.slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-950 transition-colors dark:bg-stone-950 dark:text-stone-50">
+    <div className="theme-shell min-h-screen">
       {isSidebarOpen && (
         <button
           aria-label="Close navigation"
@@ -65,7 +63,7 @@ export function AppShell({ children }: AppShellProps) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-stone-200 bg-white px-5 py-6 transition-transform dark:border-stone-800 dark:bg-stone-900 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`workspace-sidebar fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-stone-200 bg-white px-5 py-6 transition-transform dark:border-stone-800 dark:bg-stone-900 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="flex items-center justify-between px-2">
           <a className="flex items-center gap-3" href="#overview">
@@ -111,7 +109,7 @@ export function AppShell({ children }: AppShellProps) {
           {navItems.map((item) => (
             <NavLink
               className={({ isActive }) =>
-                `flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-stone-950 text-white dark:bg-amber-400 dark:text-stone-950" : "text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white"}`
+                `flex items-center gap-3 rounded-md px-3 py-3 text-sm font-semibold transition-colors ${isActive ? "bg-amber-100 text-stone-950 dark:bg-amber-400 dark:text-stone-950" : "text-stone-600 hover:bg-stone-100 hover:text-stone-950 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white"}`
               }
               to={item.path}
               key={item.label}
@@ -154,7 +152,7 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-stone-200 bg-stone-50/95 px-5 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95 sm:px-8">
+        <header className="workspace-header sticky top-0 z-10 flex h-20 items-center justify-between border-b border-stone-200 bg-stone-50/95 px-5 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95 sm:px-8">
           <div className="flex items-center gap-4">
             <button
               aria-label="Open navigation"
@@ -174,14 +172,7 @@ export function AppShell({ children }: AppShellProps) {
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <button
-              aria-label="Toggle dark mode"
-              className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-bold hover:border-stone-400 dark:border-stone-700 dark:bg-stone-900"
-              onClick={toggleTheme}
-              type="button"
-            >
-              {isDark ? "Light" : "Dark"}
-            </button>
+            <ThemeToggle />
             <button
               aria-expanded={isOpen}
               aria-label="View notifications"
