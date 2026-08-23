@@ -1,9 +1,10 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 import { Button } from "../ui";
 import { useNotifications } from "../../hooks/useNotifications";
 import { useNotificationStore } from "../../stores/notificationStore";
+import { useTheme } from "../../hooks/useTheme";
 
 type NavItem = {
   label: string;
@@ -23,6 +24,7 @@ type AppShellProps = {
 
 export function AppShell({ children }: AppShellProps) {
   const logout = useAuthStore((state) => state.logout);
+  const user = useAuthStore((state) => state.user);
   const {
     notifications,
     isOpen,
@@ -44,13 +46,12 @@ export function AppShell({ children }: AppShellProps) {
     page * pageSize,
   );
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isDark, setIsDark] = useState(() =>
-    document.documentElement.classList.contains("dark"),
-  );
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDark);
-  }, [isDark]);
+  const { isDark, toggleTheme } = useTheme();
+  const username = user?.username?.trim() || "User";
+  const displayName = [user?.firstName, user?.lastName]
+    .filter((name): name is string => Boolean(name?.trim()))
+    .join(" ") || username;
+  const initials = username.slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-950 transition-colors dark:bg-stone-950 dark:text-stone-50">
@@ -132,10 +133,10 @@ export function AppShell({ children }: AppShellProps) {
         <div className="mt-auto border-t border-stone-200 pt-5 dark:border-stone-800">
           <div className="flex items-center gap-3 px-2">
             <span className="grid size-9 place-items-center rounded-full bg-sky-100 text-sm font-bold text-sky-800">
-              JD
+              {initials}
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold">Jordan Davis</p>
+              <p className="truncate text-sm font-bold">{displayName}</p>
               <p className="truncate text-xs text-stone-500 dark:text-stone-400">
                 Product engineer
               </p>
@@ -168,7 +169,7 @@ export function AppShell({ children }: AppShellProps) {
                 Workspace
               </p>
               <h1 className="text-xl font-black tracking-tight">
-                Good morning, Jordan
+                Good morning, {username}
               </h1>
             </div>
           </div>
@@ -176,7 +177,7 @@ export function AppShell({ children }: AppShellProps) {
             <button
               aria-label="Toggle dark mode"
               className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm font-bold hover:border-stone-400 dark:border-stone-700 dark:bg-stone-900"
-              onClick={() => setIsDark((value) => !value)}
+              onClick={toggleTheme}
               type="button"
             >
               {isDark ? "Light" : "Dark"}
