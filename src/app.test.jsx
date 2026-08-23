@@ -15,7 +15,10 @@ const user = {
 }
 
 function mockAuthResponse() {
-  vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(user), { status: 200 })))
+  vi.stubGlobal('fetch', vi.fn(async (input) => {
+    const body = String(input).includes('/auth/') ? user : { tasks: [] }
+    return new Response(JSON.stringify(body), { status: 200 })
+  }))
 }
 
 describe('App authentication', () => {
@@ -49,7 +52,10 @@ describe('App authentication', () => {
 
   test('logs in through the authentication API', async () => {
     const currentUser = userEvent.setup()
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(user), { status: 200 })))
+    vi.stubGlobal('fetch', vi.fn(async (input) => {
+      const body = String(input).includes('/auth/') ? user : { tasks: [] }
+      return new Response(JSON.stringify(body), { status: 200 })
+    }))
     window.history.pushState({}, '', '/login')
     render(<App />)
 
@@ -68,7 +74,7 @@ describe('App authentication', () => {
 
     expect(await screen.findByRole('heading', { name: /your sprint at a glance/i })).toBeInTheDocument()
     await currentUser.click(screen.getByRole('link', { name: /^board$/i }))
-    expect(screen.getByText('Board Page')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /sprint board/i })).toBeInTheDocument()
   })
 
   test('logs out and returns to login', async () => {
